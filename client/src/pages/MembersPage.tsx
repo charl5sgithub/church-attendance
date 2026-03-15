@@ -180,19 +180,24 @@ export function MembersPage() {
       </form>
 
       <div className="bg-white rounded-xl shadow-sm divide-y">
-        {members.map((m) => (
+        {members.map((m, index) => (
           <div
             key={m.id}
             className="flex items-center justify-between px-3 py-3"
           >
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-slate-800">
-                {m.name}
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-semibold text-slate-400 w-5 text-center">
+                {index + 1}
               </span>
-              <span className="text-[11px] text-slate-500">
-                {m.family || "No family"} • Joined{" "}
-                {new Date(m.joinDate).toLocaleDateString()}
-              </span>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-slate-800">
+                  {m.name}
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  {m.family || "No family"} • Joined{" "}
+                  {new Date(m.joinDate).toLocaleDateString()}
+                </span>
+              </div>
             </div>
             <div className="flex gap-2">
               <button
