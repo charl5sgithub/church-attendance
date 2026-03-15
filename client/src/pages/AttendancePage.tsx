@@ -18,33 +18,51 @@ export function AttendancePage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  async function loadMembers() {
-    const res = await api.get<Member[]>("/members");
-    setMembers(res.data);
-  }
-
-  async function loadExistingAttendance(targetDate: string) {
+  async function loadExistingAttendance(targetDate: string, membersList: Member[]) {
     try {
       const res = await api.get("/attendance", {
         params: { date: targetDate }
       });
       const records: any[] = res.data;
       const map: Record<number, Status> = {};
+      
+      // Default to "present" for all loaded members
+      membersList.forEach((m) => {
+        map[m.id] = "present";
+      });
+
+      // Override with previously saved records
       records.forEach((r) => {
         map[r.memberId] = r.status === "PRESENT" ? "present" : "absent";
       });
       setStatuses(map);
     } catch {
-      // ignore
+      // If error occurs fetching records, default all to present
+      const map: Record<number, Status> = {};
+      membersList.forEach((m) => {
+        map[m.id] = "present";
+      });
+      setStatuses(map);
     }
   }
 
   useEffect(() => {
-    loadMembers();
+    async function init() {
+      try {
+        const res = await api.get<Member[]>("/members");
+        setMembers(res.data);
+        await loadExistingAttendance(date, res.data);
+      } catch {
+        // Handle gracefully
+      }
+    }
+    init();
   }, []);
 
   useEffect(() => {
-    loadExistingAttendance(date);
+    if (members.length > 0) {
+      loadExistingAttendance(date, members);
+    }
   }, [date]);
 
   async function saveAttendance() {
@@ -89,45 +107,51 @@ export function AttendancePage() {
         </div>
       )}
       <div className="bg-white rounded-xl shadow-sm divide-y">
-        {members.map((m) => {
-          const status = statuses[m.id] ?? "";
+        {members.map((m, index) => {
+          const status = statuses[m.id] ?? "present";
           return (
             <div
               key={m.id}
               className="flex items-center justify-between px-3 py-3"
             >
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-slate-800">
-                  {m.name}
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-slate-400 w-5 text-center">
+                  {index + 1}
                 </span>
-                <span className="text-[11px] text-slate-500">
-                  {m.family || "No family"}
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-slate-800">
+                    {m.name}
+                  </span>
+                  <span className="text-[11px] text-slate-500">
+                    {m.family || "No family"}
+                  </span>
+                </div>
               </div>
               <div className="flex gap-2">
                 <button
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium ${
-                    status === "present"
-                      ? "bg-green-500 text-white"
-                      : "border border-slate-200 text-slate-600 bg-white"
-                  }`}
+                  type="button"
                   onClick={() =>
-                    setStatuses((prev) => ({ ...prev, [m.id]: "present" }))
+                    setStatuses((prev) => ({
+                      ...prev,
+                      [m.id]: status === "present" ? "absent" : "present"
+                    }))
                   }
-                >
-                  Present
-                </button>
-                <button
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium ${
-                    status === "absent"
-                      ? "bg-red-500 text-white"
-                      : "border border-slate-200 text-slate-600 bg-white"
+                  className={`relative flex items-center w-24 h-8 rounded-full p-1 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 ${
+                    status === "present" ? "bg-green-500" : "bg-red-500"
                   }`}
-                  onClick={() =>
-                    setStatuses((prev) => ({ ...prev, [m.id]: "absent" }))
-                  }
                 >
-                  Absent
+                  <span
+                    className={`absolute text-[11px] font-bold text-white pointer-events-none transition-all duration-300 ${
+                      status === "present" ? "left-3" : "right-3"
+                    }`}
+                  >
+                    {status === "present" ? "PRESENT" : "ABSENT"}
+                  </span>
+                  <div
+                    className={`w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 z-10 ${
+                      status === "present" ? "translate-x-16" : "translate-x-0"
+                    }`}
+                  />
                 </button>
               </div>
             </div>
