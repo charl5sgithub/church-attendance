@@ -92,7 +92,7 @@ export function AttendancePage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-20">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold text-slate-800">Attendance</h1>
         <input
@@ -148,8 +148,8 @@ export function AttendancePage() {
                       [m.id]: status === "present" ? "absent" : "present"
                     }))
                   }
-                  className={`relative flex items-center w-24 h-8 rounded-full p-1 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 ${
-                    status === "present" ? "bg-green-500" : "bg-red-500"
+                  className={`relative flex items-center w-24 h-8 rounded-full p-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 hover:scale-110 hover:shadow-md ${
+                    status === "present" ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
                   }`}
                 >
                   <span
@@ -175,13 +175,15 @@ export function AttendancePage() {
           </p>
         )}
       </div>
-      <button
-        onClick={saveAttendance}
-        disabled={loading}
-        className="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-medium shadow-sm active:scale-[0.98] disabled:opacity-60"
-      >
-        {loading ? "Saving..." : "Save Attendance"}
-      </button>
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent z-50">
+        <button
+          onClick={saveAttendance}
+          disabled={loading}
+          className="w-full max-w-lg mx-auto block bg-indigo-600 text-white py-3 rounded-xl text-sm font-semibold shadow-lg hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-60 transition-all duration-200"
+        >
+          {loading ? "Saving..." : "Save Attendance"}
+        </button>
+      </div>
     </div>
   );
 }
