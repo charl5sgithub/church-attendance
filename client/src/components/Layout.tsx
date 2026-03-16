@@ -12,7 +12,7 @@ export function Layout() {
   }, [navigate]);
 
   const navLinkClass =
-    "flex-1 text-center py-2 text-xs sm:text-sm font-medium rounded-full";
+    "flex-1 text-center py-2 text-xs sm:text-sm font-medium rounded-full transition-all duration-200 hover:scale-105 active:scale-95";
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-100">
@@ -25,7 +25,7 @@ export function Layout() {
             localStorage.removeItem("token");
             navigate("/login");
           }}
-          className="text-xs sm:text-sm text-red-600"
+          className="text-xs sm:text-sm text-red-600 hover:text-red-800 hover:bg-red-50 px-2 py-1 rounded-lg transition-all duration-200 active:scale-95"
         >
           Logout
         </button>
@@ -67,7 +67,7 @@ export function Layout() {
             to="/reports"
             className={({ isActive }) =>
               `${navLinkClass} ${
-                isActive ? "bg-indigo-600 text-white" : "text-slate-600"
+                isActive ? "bg-indigo-600 text-white shadow-md" : "text-slate-600 hover:bg-slate-100"
               }`
             }
           >
