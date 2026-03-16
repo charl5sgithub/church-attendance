@@ -4,6 +4,7 @@ import { api } from "../services/api";
 interface Member {
   id: number;
   name: string;
+  type: string;
   family?: string;
 }
 
@@ -119,10 +120,21 @@ export function AttendancePage() {
                   {index + 1}
                 </span>
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-slate-800">
-                    {m.name}
-                  </span>
-                  <span className="text-[11px] text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-slate-800">
+                      {m.name}
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                        m.type === "Visitor"
+                          ? "bg-purple-100 text-purple-700"
+                          : "bg-blue-100 text-blue-700"
+                      }`}
+                    >
+                      {m.type || "Member"}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-500 mt-0.5">
                     {m.family || "No family"}
                   </span>
                 </div>

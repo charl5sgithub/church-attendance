@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { getAttendanceSummaryInRange } from "../services/reportService";
+import { getAttendanceSummaryInRange, getRawAttendanceInRange } from "../services/reportService";
 import PDFDocument from "pdfkit";
 
 function parseRange(req: Request): { start: Date; end: Date } | null {
@@ -44,15 +44,16 @@ export async function exportCsv(req: Request, res: Response) {
       .status(400)
       .json({ error: "start and end query parameters are required" });
   }
-  const data = await getAttendanceSummaryInRange(range.start, range.end);
+  const records = await getRawAttendanceInRange(range.start, range.end);
 
   const rows = [
-    ["Member Name", "Present Days", "Absent Days", "Attendance %"],
-    ...data.map((d) => [
-      d.name,
-      d.presentDays.toString(),
-      d.absentDays.toString(),
-      d.percentage.toString()
+    ["Member Name", "Type", "DOB", "Date", "Attendance Status"],
+    ...records.map((r) => [
+      r.member.name,
+      r.member.type,
+      r.member.dob ? r.member.dob.toISOString().slice(0, 10) : "",
+      r.date.toISOString().slice(0, 10),
+      r.status
     ])
   ];
 
@@ -96,7 +97,7 @@ export async function exportPdf(req: Request, res: Response) {
   data.forEach((d) => {
     doc
       .fontSize(12)
-      .text(`Member: ${d.name}`)
+      .text(`Member: ${d.name} (${d.type})`)
       .text(`Present: ${d.presentDays}`)
       .text(`Absent: ${d.absentDays}`)
       .text(`Attendance: ${d.percentage}%`)

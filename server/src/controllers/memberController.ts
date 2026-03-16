@@ -9,8 +9,10 @@ export async function listMembers(_req: Request, res: Response) {
 }
 
 export async function createMember(req: Request, res: Response) {
-  const { name, phone, email, family, joinDate } = req.body as {
+  const { name, type, dob, phone, email, family, joinDate } = req.body as {
     name?: string;
+    type?: string;
+    dob?: string;
     phone?: string;
     email?: string;
     family?: string;
@@ -26,9 +28,11 @@ export async function createMember(req: Request, res: Response) {
   const member = await prisma.member.create({
     data: {
       name,
-      phone,
-      email,
-      family,
+      type: type || "Member",
+      dob: dob ? new Date(dob) : null,
+      phone: phone === "" ? null : phone,
+      email: email === "" ? null : email,
+      family: family === "" ? null : family,
       joinDate: new Date(joinDate)
     }
   });
@@ -38,8 +42,10 @@ export async function createMember(req: Request, res: Response) {
 
 export async function updateMember(req: Request, res: Response) {
   const id = Number(req.params.id);
-  const { name, phone, email, family, joinDate } = req.body as {
+  const { name, type, dob, phone, email, family, joinDate } = req.body as {
     name?: string;
+    type?: string;
+    dob?: string;
     phone?: string;
     email?: string;
     family?: string;
@@ -55,9 +61,11 @@ export async function updateMember(req: Request, res: Response) {
     where: { id },
     data: {
       name: name ?? existing.name,
-      phone: phone ?? existing.phone,
-      email: email ?? existing.email,
-      family: family ?? existing.family,
+      type: type ?? existing.type,
+      dob: dob === "" ? null : dob ? new Date(dob) : existing.dob,
+      phone: phone === "" ? null : phone ?? existing.phone,
+      email: email === "" ? null : email ?? existing.email,
+      family: family === "" ? null : family ?? existing.family,
       joinDate: joinDate ? new Date(joinDate) : existing.joinDate
     }
   });

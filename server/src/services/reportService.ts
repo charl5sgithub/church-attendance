@@ -3,6 +3,7 @@ import { prisma } from "../utils/prisma";
 export interface AttendanceSummary {
   memberId: number;
   name: string;
+  type: string;
   presentDays: number;
   absentDays: number;
   percentage: number;
@@ -24,12 +25,13 @@ export async function getAttendanceSummaryInRange(
 
   const map = new Map<
     number,
-    { name: string; present: number; absent: number }
+    { name: string; type: string; present: number; absent: number }
   >();
 
   for (const r of records) {
     const existing = map.get(r.memberId) ?? {
       name: r.member.name,
+      type: r.member.type,
       present: 0,
       absent: 0
     };
@@ -48,6 +50,7 @@ export async function getAttendanceSummaryInRange(
     summaries.push({
       memberId,
       name: value.name,
+      type: value.type,
       presentDays: value.present,
       absentDays: value.absent,
       percentage: Math.round(percentage * 100) / 100
@@ -55,5 +58,18 @@ export async function getAttendanceSummaryInRange(
   }
 
   return summaries;
+}
+
+export async function getRawAttendanceInRange(start: Date, end: Date) {
+  return await prisma.attendance.findMany({
+    where: {
+      date: {
+        gte: start,
+        lte: end
+      }
+    },
+    include: { member: true },
+    orderBy: [{ date: "asc" }, { member: { name: "asc" } }]
+  });
 }
 
