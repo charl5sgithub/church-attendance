@@ -10,6 +10,8 @@ datasource db {
 model Member {
   id        Int          @id @default(autoincrement())
   name      String
+  type      String       @default("Member") // "Member" or "Visitor"
+  dob       DateTime?
   phone     String?
   email     String?
   family    String?

@@ -4,6 +4,8 @@ import { api } from "../services/api";
 interface Member {
   id: number;
   name: string;
+  type: string;
+  dob?: string;
   phone?: string;
   email?: string;
   family?: string;
@@ -12,6 +14,8 @@ interface Member {
 
 const emptyForm: Omit<Member, "id"> = {
   name: "",
+  type: "Member",
+  dob: "",
   phone: "",
   email: "",
   family: "",
@@ -47,6 +51,8 @@ export function MembersPage() {
     setEditingId(member.id);
     setForm({
       name: member.name,
+      type: member.type || "Member",
+      dob: member.dob ? member.dob.slice(0, 10) : "",
       phone: member.phone ?? "",
       email: member.email ?? "",
       family: member.family ?? "",
@@ -125,6 +131,32 @@ export function MembersPage() {
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-medium text-slate-600">
+                Type
+              </label>
+              <select
+                value={form.type}
+                onChange={(e) => setForm({ ...form, type: e.target.value })}
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+              >
+                <option value="Member">Member</option>
+                <option value="Visitor">Visitor</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-medium text-slate-600">
+                Date of Birth
+              </label>
+              <input
+                type="date"
+                value={form.dob}
+                onChange={(e) => setForm({ ...form, dob: e.target.value })}
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-medium text-slate-600">
                 Phone
               </label>
               <input
@@ -190,12 +222,24 @@ export function MembersPage() {
                 {index + 1}
               </span>
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-slate-800">
-                  {m.name}
-                </span>
-                <span className="text-[11px] text-slate-500">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-slate-800">
+                    {m.name}
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                      m.type === "Visitor"
+                        ? "bg-purple-100 text-purple-700"
+                        : "bg-blue-100 text-blue-700"
+                    }`}
+                  >
+                    {m.type || "Member"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-slate-500 mt-0.5">
                   {m.family || "No family"} • Joined{" "}
                   {new Date(m.joinDate).toLocaleDateString()}
+                  {m.dob && ` • DOB: ${new Date(m.dob).toLocaleDateString()}`}
                 </span>
               </div>
             </div>
