@@ -4,11 +4,9 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "node node_modules/prisma/build/index.js generate && node node_modules/typescript/bin/tsc",
-    "start": "node node_modules/prisma/build/index.js migrate deploy && node dist/index.js",
-    "start:local": "node dist/index.js",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:migrate:deploy": "node node_modules/prisma/build/index.js migrate deploy",
+    "build": "prisma generate && tsc",
+    "start": "node dist/index.js",
+    "prisma:push": "prisma db push",
     "prisma:generate": "prisma generate",
     "prisma:seed": "ts-node src/prisma/seed.ts"
   },
