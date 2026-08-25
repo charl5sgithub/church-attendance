@@ -11,20 +11,32 @@ const app = express();
 
 app.use(
   cors({
-    origin: "*"
+    origin: true,
+    credentials: true,
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
   })
 );
+
+app.options("*", cors());
+
 app.use(json());
 app.use(urlencoded({ extended: true }));
 
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok" });
-});
+// Register routes for both `/api/*` and `/*` so they resolve
+// whether invoked locally, through proxy, or via Vercel serverless rewrites
+const registerRoutes = (prefix: string) => {
+  app.get(`${prefix}/health`, (_req, res) => {
+    res.json({ status: "ok" });
+  });
+  app.use(`${prefix}/auth`, authRouter);
+  app.use(`${prefix}/members`, memberRouter);
+  app.use(`${prefix}/attendance`, attendanceRouter);
+  app.use(`${prefix}/reports`, reportRouter);
+};
 
-app.use("/api/auth", authRouter);
-app.use("/api/members", memberRouter);
-app.use("/api/attendance", attendanceRouter);
-app.use("/api/reports", reportRouter);
+registerRoutes("/api");
+registerRoutes("");
 
 app.use(errorHandler);
 
