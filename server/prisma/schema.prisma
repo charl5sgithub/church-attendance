@@ -3,25 +3,26 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Member {
-  id        Int          @id @default(autoincrement())
-  name      String
-  type      String       @default("Member") // "Member" or "Visitor"
-  dob       DateTime?
-  phone     String?
-  email     String?
-  family    String?
-  joinDate  DateTime
+  id         Int          @id @default(autoincrement())
+  name       String
+  type       String       @default("Member") // "Member" or "Visitor"
+  dob        DateTime?
+  phone      String?
+  email      String?
+  family     String?
+  joinDate   DateTime
   attendance Attendance[]
 }
 
 model Attendance {
-  id        Int      @id @default(autoincrement())
-  member    Member   @relation(fields: [memberId], references: [id])
+  id        Int              @id @default(autoincrement())
+  member    Member           @relation(fields: [memberId], references: [id])
   memberId  Int
   date      DateTime
   status    AttendanceStatus

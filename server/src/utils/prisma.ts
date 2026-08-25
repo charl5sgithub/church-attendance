@@ -1,13 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import { env } from "../config/env";
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: env.databaseUrl
-    }
-  }
-});
+declare global {
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient | undefined;
+}
 
-export { prisma };
+export const prisma = global.prisma || new PrismaClient();
 
+if (process.env.NODE_ENV !== "production") {
+  global.prisma = prisma;
+}
